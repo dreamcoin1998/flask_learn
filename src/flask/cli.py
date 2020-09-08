@@ -18,7 +18,7 @@ from .globals import current_app
 from .helpers import get_debug_flag
 from .helpers import get_env
 from .helpers import get_load_dotenv
-
+# 尝试导入dotenv，如果未安装设置为None
 try:
     import dotenv
 except ImportError:
@@ -604,12 +604,12 @@ def _path_is_ancestor(path, other):
 
 def load_dotenv(path=None):
     """Load "dotenv" files in order of precedence to set environment variables.
-
+    按照优先顺序设置可用的环境变量
     If an env var is already set it is not overwritten, so earlier files in the
     list are preferred over later files.
-
+    如果有env var已经被设置，将不会被覆盖，列表中较早的文件优先于更晚的文件
     This is a no-op if `python-dotenv`_ is not installed.
-
+    如果python-dotenv没有安装，则不会做任何操作
     .. _python-dotenv: https://github.com/theskumar/python-dotenv#readme
 
     :param path: Load the file at this location instead of searching.
@@ -623,6 +623,8 @@ def load_dotenv(path=None):
     """
     if dotenv is None:
         if path or os.path.isfile(".env") or os.path.isfile(".flaskenv"):
+            # click是一个命令行接口创建工具
+            # 在命令行输出下面的文字
             click.secho(
                 " * Tip: There are .env or .flaskenv files present."
                 ' Do "pip install python-dotenv" to use them.',
@@ -634,6 +636,7 @@ def load_dotenv(path=None):
 
     # if the given path specifies the actual file then return True,
     # else False
+    # 首先从path加载环境变量配置文件
     if path is not None:
         if os.path.isfile(path):
             return dotenv.load_dotenv(path)
@@ -641,7 +644,9 @@ def load_dotenv(path=None):
         return False
 
     new_dir = None
-
+    # 然后从依次从.env和.flaskenv加载配置文件
+    # 比较晚加载的不会覆盖比较早的配置文件
+    # 所以优先级应该是path > .env > .flaskenv
     for name in (".env", ".flaskenv"):
         path = dotenv.find_dotenv(name, usecwd=True)
 

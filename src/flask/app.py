@@ -836,6 +836,7 @@ class Flask(Scaffold):
         """
         # Change this into a no-op if the server is invoked from the
         # command line. Have a look at cli.py for more information.
+        # 如果从命令行调用服务器，将直接返回，后续无操作
         if os.environ.get("FLASK_RUN_FROM_CLI") == "true":
             from .debughelpers import explain_ignored_app_run
 
@@ -843,7 +844,7 @@ class Flask(Scaffold):
             return
 
         if get_load_dotenv(load_dotenv):
-            # 加载dotenv文件
+            # 加载dotenv文件以此配置环境变量
             # 可以通过dotenv来设置环境变量
             # 运行时会根据.env文件和.flaskenv文件来设置环境变量
             # 命令行参数会覆盖.env文件，.env文件会覆盖.flaskenv文件
@@ -865,6 +866,8 @@ class Flask(Scaffold):
         sn_host = sn_port = None
 
         if server_name:
+            # partition方法根据指定的分隔符来分割当前的字符串
+            # 返回一个三元组，第一个是分隔符左边的字符串，分隔符本身，分隔符右边的字符串
             sn_host, _, sn_port = server_name.partition(":")
 
         if not host:
@@ -884,6 +887,7 @@ class Flask(Scaffold):
         options.setdefault("use_debugger", self.debug)
         options.setdefault("threaded", True)
 
+        # 展示信息flask app名称和环境名称
         cli.show_server_banner(self.env, self.debug, self.name, False)
 
         from werkzeug.serving import run_simple

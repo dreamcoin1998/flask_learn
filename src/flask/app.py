@@ -893,6 +893,8 @@ class Flask(Scaffold):
         from werkzeug.serving import run_simple
 
         try:
+            # 根据参数指定后端服务器的开启方式
+            # 多线程、多进程、单进程串行
             run_simple(host, port, self, **options)
         finally:
             # reset the first request information if the development server
@@ -1540,9 +1542,11 @@ class Flask(Scaffold):
             request_started.send(self)
             rv = self.preprocess_request()
             if rv is None:
+                # 找到处理函数并返回
                 rv = self.dispatch_request()
         except Exception as e:
             rv = self.handle_user_exception(e)
+        # 处理成response
         return self.finalize_request(rv)
 
     def finalize_request(self, rv, from_error_handler=False):
@@ -2022,11 +2026,13 @@ class Flask(Scaffold):
             a list of headers, and an optional exception context to
             start the response.
         """
+        # 创建请求上下文，并把它压栈
         ctx = self.request_context(environ)
         error = None
         try:
             try:
                 ctx.push()
+                # 正确的请求处理路径，会通过路由找到对应的处理函数
                 response = self.full_dispatch_request()
             except Exception as e:
                 error = e
@@ -2038,6 +2044,7 @@ class Flask(Scaffold):
         finally:
             if self.should_ignore_error(error):
                 error = None
+            # 不管处理是否发生异常，都需要把栈中的请求 pop 出来
             ctx.auto_pop(error)
 
     def __call__(self, environ, start_response):
